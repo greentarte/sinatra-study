@@ -62,3 +62,17 @@ hash = { "짜장면" => "http://ojsfile.ohmynews.com/STD_IMG_FILE/2016/1214/IE00
  erb :lunchhash
 end
 
+get '/randomgame/:name' do
+    @name = params[:name]
+    img = ["즐거움","슬픔","행복","화남"]
+    img_hash={ "즐거움" => "http://file3.instiz.net/data/file3/2018/01/30/0/8/9/089aaddd95d4e3f6d26298edef0502b5.gif",
+    "슬픔" => "http://jjalbox.com/_data/jjalbox/2018/01/20180125_5a696c212fbd2.gif",
+    "행복" => "http://file.instiz.net/data/file/20140703/a/6/b/a6b9c40d2b2e384b952e91ce0914794c.gif",
+    "화남" => "http://jjalbox.com/_data/jjalbox/2017/12/20171221_5a3a854542aab.gif"    
+    }
+   
+    @img_result = img.sample
+    @img= img_hash[@img_result]
+    erb :randomgame
+end
+
