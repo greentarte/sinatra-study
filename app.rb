@@ -167,13 +167,28 @@ get '/opggresult' do
     @res = HTTParty.get(url+@encodeName)
     #HTML코드에서 바디안에만 검색
     @doc = Nokogiri::HTML(@res.body)
-    
+    #구글에서 개발자모드(F12로 해서 원하는 부분 클릭 후  검사 -> copy->selector로 복사)
     @win = @doc.css("#SummonerLayoutContent > div.tabItem.Content.SummonerLayoutContent.summonerLayout-summary > div.SideContent > div.TierBox.Box > div.SummonerRatingMedium > div.TierRankInfo > div.TierInfo > span.WinLose > span.wins")
     @lose = @doc.css("#SummonerLayoutContent > div.tabItem.Content.SummonerLayoutContent.summonerLayout-summary > div.SideContent > div.TierBox.Box > div.SummonerRatingMedium > div.TierRankInfo > div.TierInfo > span.WinLose > span.losses")
     @rank = @doc.css("#SummonerLayoutContent > div.tabItem.Content.SummonerLayoutContent.summonerLayout-summary > div.SideContent > div.TierBox.Box > div.SummonerRatingMedium > div.TierRankInfo > div.TierRank > span")
     
-    erb :opggresult
+    # File.open(파일이름, 옵션) do |f|
+    # 옵션 참고 정보 https://stackoverflow.com/questions/3682359/what-are-the-ruby-file-open-modes-and-options
+    #텍스트에 저장함
+    # File.open("opgg.txt", 'a+') do |f|
+    #     f.write("#{@userName} : #{@win},#{@lose},#{@rank}\n" )
+    # end
+    
+    #CSV에 저장 자동 개행
+    CSV.open('opgg.csv','a+') do |c|
+      c << [@userName, @win, @losem, @rank]
+      erb :opggresult
+    end
+    
+        
+    
 
 
 end
+
 

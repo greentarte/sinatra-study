@@ -1,0 +1,2 @@
+Hide on bush : <span class="wins">511W</span>,<span class="losses">441L</span>,<span class="tierRank">Challenger</span>소나키우자 : ,,<span class="tierRank">Unranked</span>나와썸 : <span class="wins">39W</span>,<span class="losses">50L</span>,<span class="tierRank">Platinum 4</span>
+소나키우자 : ,,<span class="tierRank">Unranked</span>
