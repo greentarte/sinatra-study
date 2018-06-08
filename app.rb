@@ -1,5 +1,22 @@
 require 'sinatra'
+# sinatra 사용
 require 'sinatra/reloader'
+# sinatra 수정시 서버 재시작하게 하는것
+require 'rest-client'
+# url 받는데 사용  터미널에서 gem install rest-client
+# gem 설치시 또는 라우팅 재설정 시  서버재시작 필요
+require 'json'
+require 'httparty'
+require 'nokogiri'
+require 'uri'
+require 'date'
+require 'csv'
+
+before do 
+    p "*****************"
+    p params
+    p "*****************"
+end
 
 get '/' do
   'Hello world! welcome'
@@ -74,5 +91,89 @@ get '/randomgame/:name' do
     @img_result = img.sample
     @img= img_hash[@img_result]
     erb :randomgame
+end
+
+get '/lotto-sample' do
+   @lotto = (1..45).to_a.sample(6).sort
+   url = "http://www.nlotto.co.kr/common.do?method=getLottoNumber&drwNo=809"
+   # Chrome 확장 프로그램 JSON View 받아서 접속하면 구분되서 보기 편함
+   @lotto_info = RestClient.get(url)
+   @lotto_hash=JSON.parse(@lotto_info)
+   
+   @winner =[]
+   @lotto_hash.each do |k, v|
+       if k.include?('drwtNo') 
+        #배열에 저장
+        @winner << v
+       end
+   end
+   # 몇개가 일치하는지 확인
+   @matchnum=(@winner & @lotto).length
+  
+   # 몇등인지 구분
+   @bonusnum =[@lotto_hash["bnusNo"]]
+    
+    bonusmatch= @bonusnum & @lotto
+    
+    #로또 당첨번호에 보너스번호가 있는지 확인 결과값  boolean
+    # 대상.include(확인할 값)으로 확인
+    
+    @result="꽝"
+    
+    if (@matchnum == 3) then @result = "5등"
+        elsif @matchnum == 4 then @result = "4등"
+            elsif @matchnum == 5 then @result = "3등"
+            elsif @matchnum == 5 and bonusmatch==1 then  @result = "2등"
+            elsif @matchnum == 6 then @result = "1등"
+            else  @result="꽝"
+    end
+    
+    # #case문
+    # @result=
+    # case [@matchnum, @lotto.include(@lotto_hash["bnusNo"])]
+    # when [6,false] then "1등"
+    # when [5,true] then "2등"
+    # when [5,false] then "3등"
+    # when [4,false] then "4등"
+    # when [3,false] then "5등"
+    # else '꽝'
+
+   erb :lottosample
+end
+
+get '/form' do
+erb :form
+end
+
+get '/search' do
+    @keyword = params[:keyword]
+    @encodeKeyword=URI.encode(@keyword)
+    url = 'https://search.naver.com/search.naver?query='
+    # erb :search
+    redirect to (url+@encodeKeyword)
+end
+
+
+get '/opgg' do
+erb :opgg
+
+end
+
+get '/opggresult' do
+    url = 'http://www.op.gg/summoner/userName='
+    @userName = params[:userName]
+    @encodeName=URI.encode(@userName)
+    
+    @res = HTTParty.get(url+@encodeName)
+    #HTML코드에서 바디안에만 검색
+    @doc = Nokogiri::HTML(@res.body)
+    
+    @win = @doc.css("#SummonerLayoutContent > div.tabItem.Content.SummonerLayoutContent.summonerLayout-summary > div.SideContent > div.TierBox.Box > div.SummonerRatingMedium > div.TierRankInfo > div.TierInfo > span.WinLose > span.wins")
+    @lose = @doc.css("#SummonerLayoutContent > div.tabItem.Content.SummonerLayoutContent.summonerLayout-summary > div.SideContent > div.TierBox.Box > div.SummonerRatingMedium > div.TierRankInfo > div.TierInfo > span.WinLose > span.losses")
+    @rank = @doc.css("#SummonerLayoutContent > div.tabItem.Content.SummonerLayoutContent.summonerLayout-summary > div.SideContent > div.TierBox.Box > div.SummonerRatingMedium > div.TierRankInfo > div.TierRank > span")
+    
+    erb :opggresult
+
+
 end
 
