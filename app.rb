@@ -185,10 +185,19 @@ get '/opggresult' do
       erb :opggresult
     end
     
+
+
+       
+end
+    get '/oplog' do 
+        @log=[]
+    CSV.foreach('opgg.csv') do |row| 
         
+        @log << row
+        # 한줄씩 보여준다 row
     
-
-
+    end
+    erb :oplog
 end
 
 
